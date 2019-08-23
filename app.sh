@@ -3,7 +3,7 @@
 source lib/cb.sh
 
 while read line; do
-  test "${line:0:3}" == "cb_" && $line "${@}"
+  test "${line:0:5}" == "__cb_" && $line "${@}"
 done < <(tclsh <<EOF
 source lib/ui.tcl
 

@@ -1,5 +1,5 @@
 #!/bin/bash
 
-function cb_do_logon() {
+function __cb_do_logon() {
   echo "$@"
 }
