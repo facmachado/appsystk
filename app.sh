@@ -1,13 +1,19 @@
 #!/bin/bash
 
+readonly PIPE='temp.pipe'
+test ! -p $PIPE && mkfifo $PIPE
+
 source lib/cb.sh
 
-while read line; do
-  test "${line:0:5}" == "__cb_" && $line "${@}"
-done < <(tclsh <<EOF
-source lib/ui.tcl
+(
+  while read line; do
+    if [[ "${line:0:7}" == "__send_" ]]; then
+      $line "${@}"
+    fi
+  done <$PIPE; \
+) &
 
-win_logon
+tclsh lib/ui.tcl & PID=$!
 
-EOF
-)
+while kill -0 $PID; do :; done
+rm -f $PIPE

@@ -2,7 +2,9 @@
 
 package require Tk
 package require sha1
-package require base64
+
+set fifo [open "temp.pipe" r+]
+fconfigure $fifo -blocking 0
 
 wm state . withdrawn
 
@@ -22,19 +24,23 @@ proc do_chpwd {oldpw0 newpw0 newpw1} {
   set g0 [sha1::sha1 $oldpw0]
   set g1 [sha1::sha1 $newpw0]
   set g2 [sha1::sha1 $newpw1]
-  puts "__cb_do_chpwd $g0 $g1 $g2"
+  puts "__send_chpwd $g0 $g1 $g2"
 }
 
 proc do_logon {user pass} {
   set h0 [sha1::sha1 $user]
   set h1 [sha1::sha1 $pass]
-  puts "__cb_do_logon $h0 $h1"
+  puts "__send_logon $h0 $h1"
 }
 
 proc do_read_code data {
   set h2 [sha1::sha1 $data]
-  puts "__cb_do_read_code $h2"
+  puts "__send_read_code $h2"
 }
+
+proc gets_pipe fifo {}
+
+proc puts_pipe {fifo data} {}
 
 proc win_chpwd {} {
   set oldpw0 {}
@@ -115,7 +121,7 @@ proc win_logon {} {
   wm resizable .top_logon 0 0
   wm title .top_logon "Logon"
   wm protocol .top_logon WM_DELETE_WINDOW {
-    exit 0
+    puts "__exit_0"
   }
 
   labelframe .top_logon.labelframe0 -text "Entre com seus dados"
@@ -134,7 +140,7 @@ proc win_logon {} {
 
   frame .top_logon.frame0
   button .top_logon.frame0.button0 -text "Sair" -command {
-    exit 0
+    puts "__exit_0"
   }
   grid .top_logon.frame0.button0 -column 0 -padx 5 -pady 5 -row 0
 
@@ -161,7 +167,7 @@ proc win_logon {} {
     set pass {}
   }
 
-  after 1000 {
+  after 100 {
     center_window .top_logon
     focus .top_logon.labelframe0.entry0
   }
@@ -195,3 +201,10 @@ proc win_read_code {} {
     focus .top_read_code.labelframe0.entry0
   }
 }
+
+win_logon
+
+fileevent $fifo readable [list gets_pipe $fifo]
+fileevent $fifo writable {}
+
+# https://wiki.tcl-lang.org/page/Example+of+reading+and+writing+to+a+piped+command
