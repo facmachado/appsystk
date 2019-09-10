@@ -12,7 +12,7 @@ proc center_window win {
   if {[string equal $win [winfo toplevel $win]]} {
     set g [split [wm geometry $win] {x+}]
     set resls [exec bash -c {
-      xrandr | grep ' connected ' | grep -Po '[0-9]+x[0-9]+\+[0-9]+\+[0-9]'
+      xrandr | grep -Po '[0-9]+x[0-9]+\+[0-9]+\+[0-9]'
     }]
     foreach res $resls {
       set sc [split $res {x+}]
@@ -108,7 +108,7 @@ proc win_chpwd {} {
     set newpw1 {}
   }
 
-  after 100 {
+  after 200 {
     center_window .top_chpwd
     focus .top_chpwd.labelframe0.entry0
   }
@@ -123,7 +123,7 @@ proc win_logon {} {
   wm resizable .top_logon 0 0
   wm title .top_logon "Logon"
   wm protocol .top_logon WM_DELETE_WINDOW {
-    puts "__exit_0"
+    do_exit
   }
 
   labelframe .top_logon.labelframe0 -text "Entre com seus dados"
@@ -142,7 +142,7 @@ proc win_logon {} {
 
   frame .top_logon.frame0
   button .top_logon.frame0.button0 -text "Sair" -command {
-    puts "__exit_0"
+    do_exit
   }
   grid .top_logon.frame0.button0 -column 0 -padx 5 -pady 5 -row 0
 
@@ -169,7 +169,7 @@ proc win_logon {} {
     set pass {}
   }
 
-  after 100 {
+  after 200 {
     center_window .top_logon
     focus .top_logon.labelframe0.entry0
   }
@@ -198,7 +198,7 @@ proc win_read_code {} {
     set data {}
   }
 
-  after 100 {
+  after 200 {
     center_window .top_read_code
     focus .top_read_code.labelframe0.entry0
   }
