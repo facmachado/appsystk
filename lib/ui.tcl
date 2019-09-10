@@ -11,10 +11,17 @@ font configure TkTextFont -family "Noto Sans" -size 9
 proc center_window win {
   if {[string equal $win [winfo toplevel $win]]} {
     set g [split [wm geometry $win] {x+}]
-    # set x [expr {([winfo vrootwidth $win]-[lindex $g 0]) /2}]
-    # set y [expr {([winfo vrootheight $win]-[lindex $g 1]) /2}]
-    set x [expr {([winfo screenwidth $win]-[lindex $g 0]) /2}]
-    set y [expr {([winfo screenheight $win]-[lindex $g 1]) /2}]
+    set resls [exec bash -c {
+      xrandr | grep ' connected ' | grep -Po '[0-9]+x[0-9]+\+[0-9]+\+[0-9]'
+    }]
+    foreach res $resls {
+      set sc [split $res {x+}]
+      if {[winfo pointerx $win] < [lindex $sc 0] && [winfo pointery $win] < [lindex $sc 1]} {
+        break
+      }
+    }
+    set x [expr {([lindex $sc 0]-[lindex $g 0])/2+[lindex $sc 2]}]
+    set y [expr {([lindex $sc 1]-[lindex $g 1])/2+[lindex $sc 3]}]
     wm geometry $win +$x+$y
   }
 }
