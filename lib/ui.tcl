@@ -3,9 +3,6 @@
 package require Tk
 package require sha1
 
-set fifo [open "temp.pipe" r+]
-fconfigure $fifo -blocking 0
-
 wm state . withdrawn
 
 font configure TkDefaultFont -family "Noto Sans" -size 9
@@ -14,8 +11,10 @@ font configure TkTextFont -family "Noto Sans" -size 9
 proc center_window win {
   if {[string equal $win [winfo toplevel $win]]} {
     set g [split [wm geometry $win] {x+}]
-    set x [expr {([winfo vrootwidth $win]-[lindex $g 0]) /2}]
-    set y [expr {([winfo vrootheight $win]-[lindex $g 1]) /2}]
+    # set x [expr {([winfo vrootwidth $win]-[lindex $g 0]) /2}]
+    # set y [expr {([winfo vrootheight $win]-[lindex $g 1]) /2}]
+    set x [expr {([winfo screenwidth $win]-[lindex $g 0]) /2}]
+    set y [expr {([winfo screenheight $win]-[lindex $g 1]) /2}]
     wm geometry $win +$x+$y
   }
 }
@@ -24,23 +23,19 @@ proc do_chpwd {oldpw0 newpw0 newpw1} {
   set g0 [sha1::sha1 $oldpw0]
   set g1 [sha1::sha1 $newpw0]
   set g2 [sha1::sha1 $newpw1]
-  puts "__send_chpwd $g0 $g1 $g2"
+  do_send "__send_chpwd $g0 $g1 $g2"
 }
 
 proc do_logon {user pass} {
   set h0 [sha1::sha1 $user]
   set h1 [sha1::sha1 $pass]
-  puts "__send_logon $h0 $h1"
+  do_send "__send_logon $h0 $h1"
 }
 
 proc do_read_code data {
   set h2 [sha1::sha1 $data]
-  puts "__send_read_code $h2"
+  do_send "__send_read_code $h2"
 }
-
-proc gets_pipe fifo {}
-
-proc puts_pipe {fifo data} {}
 
 proc win_chpwd {} {
   set oldpw0 {}
@@ -201,10 +196,3 @@ proc win_read_code {} {
     focus .top_read_code.labelframe0.entry0
   }
 }
-
-win_logon
-
-fileevent $fifo readable [list gets_pipe $fifo]
-fileevent $fifo writable {}
-
-# https://wiki.tcl-lang.org/page/Example+of+reading+and+writing+to+a+piped+command

@@ -6,10 +6,10 @@ function __send_chpwd() {
 
 function __send_logon() {
   echo "$@"
-  echo "__recv_win_read_code" >$PIPE
+  echo "__recv_win_read_code"
 }
 
 function __send_read_code() {
   echo "$@"
-  echo "__recv_win_main" >$PIPE
+  echo "__recv_win_main"
 }

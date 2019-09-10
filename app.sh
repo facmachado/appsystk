@@ -1,19 +1,17 @@
 #!/bin/bash
 
-readonly PIPE='temp.pipe'
-test ! -p $PIPE && mkfifo $PIPE
+exec env tclsh <<EOF
+source lib/ui.tcl
 
-source lib/cb.sh
+proc do_send command {
+  set result [exec env bash -c "source lib/cb.sh && \$command" >@stdout]
+  do_recv \$result
+}
 
-(
-  while read line; do
-    if [[ "${line:0:7}" == "__send_" ]]; then
-      $line "${@}"
-    fi
-  done <$PIPE; \
-) &
+proc do_recv result {
+  set function [lindex \$result 0]
+  eval \$function
+}
 
-tclsh lib/ui.tcl & PID=$!
-
-while kill -0 $PID; do :; done
-rm -f $PIPE
+win_logon
+EOF
