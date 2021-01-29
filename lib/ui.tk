@@ -1,0 +1,28 @@
+#!/usr/bin/wish
+
+#
+#  Copyright (c) 2021 Flavio Augusto (@facmachado)
+#
+#  License not mandatory. download it and have fun.
+#
+
+proc win_bot1 {} {
+  entry .ent1 -textvariable name
+  bind .ent1 <Return> {
+    .but1 invoke
+  }
+  pack .ent1
+
+  button .but1 -text "Hello" -command {
+    puts [call Hello '$name']
+    set name {}
+  }
+  pack .but1
+
+  focus .ent1
+}
+
+wm attributes . -type dialog
+wm resizable . 0 0
+wm title . {}
+win_bot1

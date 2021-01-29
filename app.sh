@@ -1,21 +1,21 @@
 #!/bin/bash
 
-exec env tclsh <<EOF
-source lib/ui.tcl
+#
+#  Copyright (c) 2021 Flavio Augusto (@facmachado)
+#
+#  License not mandatory. Download it and have fun.
+#
 
-proc do_exit {} {
-  exit 0
+src_dir=$(realpath "$(dirname "${BASH_SOURCE[0]}")")
+lib_dir="$src_dir/lib"
+ui_tk="$lib_dir/ui.tk"
+cb_sh="$lib_dir/cb.sh"
+tk_exe=$(command -v wish)
+
+exec "$tk_exe" <<EOF
+proc call {shcmd args} {
+  return [exec bash -c "source '$cb_sh' && \$shcmd \$args"]
 }
 
-proc do_send command {
-  set result [exec env bash -c "source lib/cb.sh && \$command"]
-  do_recv \$result
-}
-
-proc do_recv result {
-  set function [string range [lindex \$result 0] 7 9999]
-  eval \$function
-}
-
-win_logon
+source "$ui_tk"
 EOF

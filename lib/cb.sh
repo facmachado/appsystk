@@ -1,13 +1,11 @@
 #!/bin/bash
 
-function __send_chpwd() {
-  echo "$@"
-}
+#
+#  Copyright (c) 2021 Flavio Augusto (@facmachado)
+#
+#  License not mandatory. Download it and have fun.
+#
 
-function __send_logon() {
-  echo "__recv_win_read_code" "$@"
-}
-
-function __send_read_code() {
-  echo "__recv_win_main" "$@"
+function Hello() {
+  echo "Hello" "$@"
 }

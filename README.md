@@ -1,5 +1,5 @@
 # appsystk
 
-System template using TCL/TK and Shell Script
+Simple example using Tcl/Tk and Bash
 
-Comming soon...
+License not mandatory. Download it and have fun.
